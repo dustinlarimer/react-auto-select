@@ -1,4 +1,4 @@
-dots
-====
+react-select
+============
 
-A fun place for dots to play! React.js + Firebase demo
+A simple autocomplete-select component for React.js

@@ -2,7 +2,6 @@ var gulp = require('gulp');
 
 var browserify = require('browserify'),
     connect = require('gulp-connect'),
-    runSequence = require('run-sequence'),
     reactify = require('reactify'),
     source = require('vinyl-source-stream');
 
@@ -25,10 +24,8 @@ gulp.task('connect', function () {
   });
 });
 
-gulp.task('watch', function() {
+gulp.task('watch', ['connect'], function() {
   gulp.watch(['./lib/**/*.js'], ['browserify']);
 });
 
-gulp.task('default', function(callback){
-  runSequence('browserify', 'connect', 'watch', callback);
-});
+gulp.task('default', ['browserify', 'connect', 'watch']);
