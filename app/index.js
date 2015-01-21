@@ -29,10 +29,8 @@ var Select = React.createClass({displayName: "Select",
   },
 
   handleChange: function(e) {
-    // console.log(this.refs);
     this.setState({ userInput: e.target.value });
     if (this.state.visible) {
-      // this.resetState();
       this.setState({ limit: 30, selectedItem: 0 });
       this.refs.scrollpane.getDOMNode().scrollTop = 0;
     }
@@ -42,13 +40,16 @@ var Select = React.createClass({displayName: "Select",
   },
 
   handleFocus: function(e) {
-    if (!this.refs.input.getDOMNode().value.length) {
+    // if !this.refs.input.getDOMNode().value.length
+    if (!this.state.visible) {
       this.setState({ visible: true });
+    }
+    else {
+      this.resetState();
     }
   },
 
   handleBlur: function(e) {
-    // var self = this;
     this.timeout = setTimeout(this.resetState, 250);
   },
 
@@ -56,22 +57,19 @@ var Select = React.createClass({displayName: "Select",
     clearTimeout(this.timeout);
   },
 
-  handleItemKeyPress: function(e) {
-    console.log('item-key-down', e);
-    this.setState({ selectedItem: 0 });
-    this.refs.input.getDOMNode().focus();
-  },
-
   handleItemSelection: function(index) {
     if (typeof this.props.items[index]) {
       this.setState({ userInput: String(this.props.items[index]) });
+      this.refs.input.getDOMNode().focus();
       this.resetState();
     }
   },
 
   handleKeyDown: function(e) {
     var itemHeight, itemOffset;
-    if (e.keyCode === 9 || e.keyCode === 16) return;
+
+    // console.log(e.keyCode, e.key, this.state.selectedItem);
+    if (e.key === "Tab" || e.key === "Shift") return;
 
     this.setState({ visible: true });
     if (this.refs.list) {
@@ -79,8 +77,9 @@ var Select = React.createClass({displayName: "Select",
       itemOffset = itemHeight * this.state.selectedItem;
     }
 
-    switch (e.keyCode) {
-      case 38: // up
+    switch (e.key) {
+
+      case "ArrowUp": // up
         if (this.state.selectedItem-1 >= 0) {
           this.setState({ selectedItem: this.state.selectedItem-1 });
         }
@@ -92,7 +91,8 @@ var Select = React.createClass({displayName: "Select",
         }
         e.preventDefault();
         break;
-      case 40: // down
+
+      case "ArrowDown": // down
         if (this.state.selectedItem+1 < this.state.visibleItems) {
           this.setState({ selectedItem: this.state.selectedItem+1 });
         }
@@ -104,7 +104,8 @@ var Select = React.createClass({displayName: "Select",
         }
         e.preventDefault();
         break;
-      case 13: // enter
+
+      case "Enter": // enter
         if (this.refs.list) {
           this.handleItemSelection( this.refs.list.getDOMNode().children[this.state.selectedItem].value );
         }
@@ -114,9 +115,8 @@ var Select = React.createClass({displayName: "Select",
         }
         e.preventDefault();
         break;
-    }
 
-    // console.log(e.keyCode, e.key, this.state.selectedItem);
+    }
   },
 
   handleScroll: function(e) {
@@ -127,6 +127,8 @@ var Select = React.createClass({displayName: "Select",
       this.setState({ limit: this.state.limit + 30 });
     }
   },
+
+  // Data management
 
   appendListItems: function(arr) {
     var self = this;
@@ -159,14 +161,6 @@ var Select = React.createClass({displayName: "Select",
 
   // React methods
 
-  // componentDidMount: function(){
-  //   console.log('here');
-  //   this.getDOMNode().addEventListener('keydown', function(e){
-  //     console.log('window', e);
-  //   })
-  //   // console.log()
-  // },
-
   render: function(){
     var self = this,
         count = 0;
@@ -179,13 +173,11 @@ var Select = React.createClass({displayName: "Select",
       // Simple result limiting
       count++; if (count > self.state.limit) return;
       self.state.visibleItems = self.state.visibleItems+1;
-      // console.log(self.state.visibleItems);
       return React.createElement("li", {className: self.state.selectedItem === count-1 ? "react-select-item active" : "react-select-item", 
           key: index, 
           value: item, 
           onClick: self.handleItemSelection.bind(self, index), 
-          onFocus: self.handleItemFocus.bind(self, index), 
-          onKeyPress: self.handleItemKeyPress.bind(self, index)}, 
+          onFocus: self.handleItemFocus.bind(self, index)}, 
             item
         );
     });
@@ -193,7 +185,7 @@ var Select = React.createClass({displayName: "Select",
     // Hide scrollpane unless active
     var scrollpane;
     if (self.state.visible) {
-      scrollpane = React.createElement("div", {ref: "scrollpane", className: "react-select-scrollpane", onScroll: this.handleScroll}, 
+      scrollpane = React.createElement("div", {ref: "scrollpane", className: "react-select-scrollpane", onScroll: this.handleScroll, tabIndex: "-1"}, 
         React.createElement("ul", {ref: "list", className: "react-select-list"}, 
           items
         )
