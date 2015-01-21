@@ -1,4 +1,43 @@
 body {
+  font-family: "Helvetica Neue", Helvetica, sans-serif;
+  font-size: 14px;
   margin: 0;
   padding: 0;
+}
+label {
+  color: #808080;
+  line-height: 24px;
+}
+
+.react-select-input {
+  box-sizing: border-box;
+  padding: 5px;
+  width: 100%;
+}
+
+.react-select .react-select-scrollpane {
+  border: 1px solid #d7d7d7;
+  height: 200px;
+  margin: 5px 0;
+  overflow-y: scroll;
+}
+
+.react-select-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.react-select-item {
+  border-top: 1px solid #d7d7d7;
+  cursor: pointer;
+  display: block;
+  padding: 5px;
+}
+.react-select-item:hover {
+  background-color: #f2f2f2;
+}
+
+.react-select-item:first-child {
+  border-top-color: transparent;
 }

@@ -1,12 +1,11 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var React = require('react');
-React.initializeTouchEvents(true);
 
 var Select = React.createClass({displayName: "Select",
 
   getDefaultProps: function() {
     return {
-      items: [] //['one', 'two', 'three']
+      items: []
     };
   },
 
@@ -14,17 +13,45 @@ var Select = React.createClass({displayName: "Select",
     return {
       classes: 'react-select',
       limit: 30,
-      userInput: ''
+      userInput: '',
+      visible: false
     };
+  },
+
+  resetState: function(){
+    this.setState({
+      visible: false,
+      limit: 30
+    });
   },
 
   handleChange: function(e) {
     this.setState({ userInput: e.target.value });
+    this.refs.scrollpane.getDOMNode().scrollTop = 0;
+  },
+
+  handleFocus: function(e) {
+    this.setState({ visible: true });
+  },
+
+  handleBlur: function(e) {
+    var self = this;
+    setTimeout(self.resetState, 250);
   },
 
   handleItemSelection: function(index){
-    if (index && this.props.items[index]) {
-      this.setState({ userInput: this.props.items[index] });
+    if (typeof this.props.items[index]) {
+      this.setState({ userInput: String(this.props.items[index]) });
+      this.resetState();
+    }
+  },
+
+  handleScroll: function(e) {
+    var pane = this.refs.scrollpane.getDOMNode();
+    var diff = pane.scrollHeight - pane.scrollTop - 200;
+      // -200 offset is a hack to account for fixed height
+    if (diff < 50) {
+      this.setState({ limit: this.state.limit + 30 });
     }
   },
 
@@ -57,46 +84,59 @@ var Select = React.createClass({displayName: "Select",
     return this;
   },
 
-  // componentWillMount: function(){},
-  // componentDidMount: function() {},
-  // componentWillUnmount: function() {},
-
   render: function(){
-    var self = this;
-    var count = 0;
-    var items = this.props.items.map(function(item, index) {
+    var self = this,
+        count = 0;
 
+    var items = this.props.items.map(function(item, index) {
       // If input is present, skip items that don't match
       if (self.state.userInput.length > 0 && String(item).search(self.state.userInput) < 0) return;
 
-      count++;
-      if (count > self.state.limit) return;
+      // Simple result limiting
+      count++; if (count > self.state.limit) return;
 
+      // Bind onClick action
       var boundClick = self.handleItemSelection.bind(self, index);
-      return React.createElement("li", {className: "react-select-option", key: index, onClick: boundClick}, item)
+      return React.createElement("li", {className: "react-select-item", key: index, onClick: boundClick}, item)
     });
-    return React.createElement("div", {className: this.state.classes}, 
-      React.createElement("input", {ref: "input", value: this.state.userInput, onChange: this.handleChange}), 
-      React.createElement("ul", {ref: "list"}, 
-        items
-      )
+
+    // Hide scrollpane unless active
+    var scrollpane;
+    if (self.state.visible) {
+      scrollpane = React.createElement("div", {ref: "scrollpane", className: "react-select-scrollpane", onScroll: this.handleScroll}, 
+        React.createElement("ul", {ref: "list", className: "react-select-list"}, 
+          items
+        )
+      );
+    }
+
+    return React.createElement("div", {ref: "wrapper", className: this.state.classes}, 
+      React.createElement("input", {ref: "input", className: "react-select-input", value: this.state.userInput, onChange: this.handleChange, onFocus: this.handleFocus, onBlur: this.handleBlur}), 
+      scrollpane
     )
   }
 
 });
 
-// For testing
+module.exports = Select;
+
+// ----------------------------------
+// Let's test it!
+// ----------------------------------
 window.demoSelect = React.render( React.createElement(Select, null), document.getElementById('example') );
+
+// Load up 2000 data points quick
+var demoData = [];
 for (var i = 0; i < new Array(2000).length; i++) {
-  // console.log(i)
-  window.demoSelect.appendListItems([i]);
+  demoData.push(i);
 }
+
+// Let loose the Kraken!
+window.demoSelect.appendListItems(demoData);
 
 // .appendListItems(['four', 'five', 'six', 'seven'])
 // .insertListItems(0, ['a', 'b', 'c'])
 // .sortListItems('desc');
-
-module.exports = Select;
 
 },{"react":148}],2:[function(require,module,exports){
 // shim for using process in browser
