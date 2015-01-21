@@ -75,7 +75,7 @@ var Select = React.createClass({displayName: "Select",
 
     this.setState({ visible: true });
     if (this.refs.list) {
-      itemHeight = this.refs.list.getDOMNode().children[this.state.selectedItem].scrollHeight;
+      itemHeight = this.refs.list.getDOMNode().children[this.state.selectedItem].scrollHeight + 1;
       itemOffset = itemHeight * this.state.selectedItem;
     }
 
@@ -88,7 +88,7 @@ var Select = React.createClass({displayName: "Select",
           this.setState({ selectedItem: 0 });
         }
         if (this.refs.list && itemOffset > itemHeight*3) {
-          this.refs.scrollpane.getDOMNode().scrollTop -= itemHeight+1;
+          this.refs.scrollpane.getDOMNode().scrollTop -= itemHeight;
         }
         e.preventDefault();
         break;
@@ -100,7 +100,7 @@ var Select = React.createClass({displayName: "Select",
           this.setState({ selectedItem: this.state.visibleItems-1 });
         }
         if (this.refs.list && itemOffset > itemHeight*3) {
-          this.refs.scrollpane.getDOMNode().scrollTop += itemHeight+1;
+          this.refs.scrollpane.getDOMNode().scrollTop += itemHeight;
         }
         e.preventDefault();
         break;
