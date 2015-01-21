@@ -6,13 +6,14 @@ var Select = React.createClass({displayName: "Select",
 
   getDefaultProps: function() {
     return {
-      options: ['one', 'two', 'three']
+      items: [] //['one', 'two', 'three']
     };
   },
 
   getInitialState: function() {
     return {
       classes: 'react-select',
+      limit: 30,
       userInput: ''
     };
   },
@@ -22,34 +23,34 @@ var Select = React.createClass({displayName: "Select",
   },
 
   handleItemSelection: function(index){
-    if (index && this.props.options[index]) {
-      this.setState({ userInput: this.props.options[index] });
+    if (index && this.props.items[index]) {
+      this.setState({ userInput: this.props.items[index] });
     }
   },
 
   appendListItems: function(arr) {
     var self = this;
     arr.forEach(function(opt, i){
-      self.props.options.push(opt);
+      self.props.items.push(opt);
     });
     this.forceUpdate();
     return this;
   },
 
   insertListItems: function(index, arr){
-    this.props.options.splice.apply(this.props.options, [index,0].concat(arr));
+    this.props.items.splice.apply(this.props.items, [index,0].concat(arr));
     this.forceUpdate();
     return this;
   },
 
   removeListItems: function(){
-    this.props.options = [];
+    this.props.items = [];
     this.forceUpdate();
     return this;
   },
 
   sortListItems: function(str){
-    this.props.options.sort(function(a,b){
+    this.props.items.sort(function(a,b){
       return str === 'desc' ? a < b : b < a;
     });
     this.forceUpdate();
@@ -62,18 +63,22 @@ var Select = React.createClass({displayName: "Select",
 
   render: function(){
     var self = this;
-    var options = this.props.options.map(function(option, index) {
+    var count = 0;
+    var items = this.props.items.map(function(item, index) {
 
       // If input is present, skip items that don't match
-      if (self.state.userInput.length > 0 && option.search(self.state.userInput) < 0) return;
+      if (self.state.userInput.length > 0 && String(item).search(self.state.userInput) < 0) return;
+
+      count++;
+      if (count > self.state.limit) return;
 
       var boundClick = self.handleItemSelection.bind(self, index);
-      return React.createElement("li", {className: "react-select-option", key: index, onClick: boundClick}, option)
+      return React.createElement("li", {className: "react-select-option", key: index, onClick: boundClick}, item)
     });
     return React.createElement("div", {className: this.state.classes}, 
       React.createElement("input", {ref: "input", value: this.state.userInput, onChange: this.handleChange}), 
       React.createElement("ul", {ref: "list"}, 
-        options
+        items
       )
     )
   }
@@ -82,10 +87,14 @@ var Select = React.createClass({displayName: "Select",
 
 // For testing
 window.demoSelect = React.render( React.createElement(Select, null), document.getElementById('example') );
-// demoSelect
-//   .appendListItems(['four', 'five', 'six', 'seven'])
-//   .insertListItems(0, ['a', 'b', 'c'])
-//   .sortListItems('desc');
+for (var i = 0; i < new Array(2000).length; i++) {
+  // console.log(i)
+  window.demoSelect.appendListItems([i]);
+}
+
+// .appendListItems(['four', 'five', 'six', 'seven'])
+// .insertListItems(0, ['a', 'b', 'c'])
+// .sortListItems('desc');
 
 module.exports = Select;
 
