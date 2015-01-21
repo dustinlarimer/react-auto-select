@@ -9,6 +9,10 @@ label {
   line-height: 24px;
 }
 
+.react-select {
+  position: relative;
+}
+
 .react-select-input {
   box-sizing: border-box;
   padding: 5px;
@@ -20,6 +24,8 @@ label {
   height: 200px;
   margin: 5px 0;
   overflow-y: scroll;
+  position: absolute;
+  width: 100%;
 }
 
 .react-select-list {
@@ -28,15 +34,25 @@ label {
   padding: 0;
 }
 
+.react-select-list li {}
+
 .react-select-item {
   border-top: 1px solid #d7d7d7;
+  color: #4d4d4d;
   cursor: pointer;
   display: block;
   padding: 5px;
+  text-decoration: none;
 }
+.react-select-item:active { outline: none; }
+
+.react-select li.active,
+.react-select-item:focus,
 .react-select-item:hover {
   background-color: #f2f2f2;
+  /*outline: none;*/
 }
+
 
 .react-select-item:first-child {
   border-top-color: transparent;
